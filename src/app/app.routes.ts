@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { Login } from './components/login/login';
-import { App } from './app';
+import { PacientesComponent } from './components/pacientes/pacientes';
 
 export const routes: Routes = [
   {
@@ -9,7 +9,7 @@ export const routes: Routes = [
   },
   {
     path: 'pacientes',
-    component: App
+    component: PacientesComponent
   },
   {
     path: '',
