@@ -27,8 +27,13 @@ export class PacientesService {
     return collectionData(q, { idField: 'id' }).pipe(
       map((pacientes: any[]) =>
         pacientes.map(paciente => ({
-          ...paciente,
-          fechaNacimiento: paciente.fechaNacimiento?.toDate?.() || paciente.fechaNacimiento
+          id: paciente.id,
+          nombre: paciente.nombre,
+          apellidos: paciente.apellidos,
+          fechaNacimiento: paciente.fechaNacimiento?.toDate?.() || paciente.fechaNacimiento,
+          domicilio: paciente.domicilio,
+          correoElectronico: paciente.correoElectronico,
+          ownerId: paciente.ownerId || ''
         }))
       )
     ) as Observable<Paciente[]>;
@@ -55,7 +60,8 @@ export class PacientesService {
       apellidos: paciente.apellidos?.trim() || '',
       fechaNacimiento: paciente.fechaNacimiento,
       domicilio: paciente.domicilio?.trim() || '',
-      correoElectronico: paciente.correoElectronico?.toLowerCase().trim() || ''
+      correoElectronico: paciente.correoElectronico?.toLowerCase().trim() || '',
+      ownerId: paciente.ownerId || ''
     };
   }
 }

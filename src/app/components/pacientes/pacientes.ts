@@ -103,9 +103,16 @@ export class PacientesComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const ownerId = this.authService.getCurrentUserId();
+    if (!ownerId) {
+      alert('❌ Debes estar autenticado para agregar pacientes');
+      return;
+    }
+
     const paciente: Paciente = {
       ...this.pacienteForm.value,
-      fechaNacimiento: new Date(this.pacienteForm.value.fechaNacimiento)
+      fechaNacimiento: new Date(this.pacienteForm.value.fechaNacimiento),
+      ownerId: ownerId
     };
 
     this.editingId ? this.updatePaciente(paciente) : this.addPaciente(paciente);
@@ -115,7 +122,13 @@ export class PacientesComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     console.log('📝 Agregando paciente:', paciente);
     
-    this.pacientesService.addPaciente(paciente)
+    const currentUserId = this.authService.getCurrentUserId();
+    const pacienteConOwner: Paciente = {
+      ...paciente,
+      ownerId: currentUserId || ''
+    };
+    
+    this.pacientesService.addPaciente(pacienteConOwner)
       .then(() => {
         console.log('✅ Paciente agregado a Firebase');
         alert('✅ Paciente agregado exitosamente');
