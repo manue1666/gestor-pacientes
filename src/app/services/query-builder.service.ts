@@ -41,7 +41,7 @@ export interface ApiResponse<T> {
   providedIn: 'root'
 })
 export class QueryBuilderService {
-  private apiUrl = 'http://localhost:5112/api';
+  private apiUrl = 'https://querybuilderapi-production.up.railway.app/api';
 
   constructor(private http: HttpClient) {}
 

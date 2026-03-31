@@ -33,7 +33,7 @@ export interface LoginRequest {
   providedIn: 'root'
 })
 export class QueryBuilderAuthService {
-  private apiUrl = 'http://localhost:5112/api/Auth';
+  private apiUrl = 'https://querybuilderapi-production.up.railway.app/api/Auth';
   private tokenKey = 'qb_auth_token';
   private userIdKey = 'qb_user_id';
   
