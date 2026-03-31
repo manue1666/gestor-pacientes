@@ -1,0 +1,257 @@
+<div class="query-builder-container">
+  <!-- Header -->
+  <header class="query-header">
+    <div class="header-content">
+      <h1>Query Builder AI</h1>
+      <button class="btn-logout" (click)="logout()">Cerrar Sesión</button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="query-main">
+    <div class="query-layout">
+      <!-- Left Panel: Generator -->
+      <div class="generator-panel">
+        <!-- Database Selector -->
+        <div class="section">
+          <div class="section-header">
+            <label class="section-title">Selecciona una Base de Datos</label>
+            <div class="header-buttons">
+              <button class="btn-create-db" (click)="showCreateDatabase = !showCreateDatabase" title="Crear nueva base de datos">
+                Crear BD
+              </button>
+              <button 
+                class="btn-edit-db" 
+                (click)="startEditDatabase(selectedDatabaseId)"
+                [disabled]="!selectedDatabaseId"
+                title="Editar base de datos seleccionada">
+                Editar
+              </button>
+              <button 
+                class="btn-delete-db" 
+                (click)="deleteDatabaseWithQueries(selectedDatabaseId!)"
+                [disabled]="!selectedDatabaseId || isDeletingDB"
+                title="Eliminar base de datos seleccionada">
+                {{ isDeletingDB ? 'Eliminando...' : 'Eliminar' }}
+              </button>
+            </div>
+          </div>
+          <select 
+            [(ngModel)]="selectedDatabaseId" 
+            (change)="onDatabaseChange()"
+            class="database-select"
+            [disabled]="!databases || databases.length === 0">
+            <option [value]="null">-- Selecciona una BD --</option>
+            <option *ngFor="let db of databases" [value]="db.id">
+              {{ db.name }}
+            </option>
+          </select>
+          <div *ngIf="databases && databases.length === 0" class="info-box">
+            No tienes bases de datos registradas. Crea una en tu aplicación.
+          </div>
+        </div>
+
+        <!-- Create Database Form -->
+        <div class="section" *ngIf="showCreateDatabase && databaseForm">
+          <form [formGroup]="databaseForm" (ngSubmit)="createDatabase()" class="create-db-form">
+            <label class="section-title">Crear Nueva Base de Datos</label>
+            
+            <div class="form-group">
+              <input 
+                type="text" 
+                formControlName="name"
+                class="form-input"
+                placeholder="Nombre de la base de datos (ej: MiBD)"
+                [class.is-invalid]="databaseForm.get('name')?.invalid && databaseForm.get('name')?.touched">
+              <div class="form-error" *ngIf="databaseForm.get('name')?.invalid && databaseForm.get('name')?.touched">
+                El nombre es requerido (mínimo 3 caracteres)
+              </div>
+            </div>
+
+            <div class="form-group">
+              <textarea 
+                formControlName="description"
+                class="form-input"
+                placeholder="Descripción de la base de datos (ej: BD para gestión de usuarios y pedidos)"
+                rows="2"
+                [class.is-invalid]="databaseForm.get('description')?.invalid && databaseForm.get('description')?.touched"></textarea>
+              <div class="form-error" *ngIf="databaseForm.get('description')?.invalid && databaseForm.get('description')?.touched">
+                La descripción es requerida (mínimo 10 caracteres)
+              </div>
+            </div>
+
+            <div class="form-group">
+              <textarea 
+                formControlName="sqlSchema"
+                class="form-input"
+                placeholder="Esquema SQL (ej: CREATE TABLE users (id INT PRIMARY KEY, email VARCHAR(255), name VARCHAR(100));)"
+                rows="3"
+                [class.is-invalid]="databaseForm.get('sqlSchema')?.invalid && databaseForm.get('sqlSchema')?.touched"></textarea>
+              <div class="form-error" *ngIf="databaseForm.get('sqlSchema')?.invalid && databaseForm.get('sqlSchema')?.touched">
+                El esquema SQL es requerido (mínimo 20 caracteres)
+              </div>
+            </div>
+
+            <div class="button-group">
+              <button type="submit" class="btn-action" [disabled]="databaseForm.invalid || isCreatingDB">
+                {{ isCreatingDB ? 'Creando...' : 'Crear' }}
+              </button>
+              <button type="button" class="btn-cancel" (click)="showCreateDatabase = false">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Messages -->
+        <div *ngIf="successMessage" class="alert alert-success">
+          {{ successMessage }}
+        </div>
+        <div *ngIf="errorMessage" class="alert alert-danger">
+          {{ errorMessage }}
+        </div>
+
+        <!-- Edit Database Form -->
+        <div class="section" *ngIf="showEditDatabase && editDatabaseForm">
+          <form [formGroup]="editDatabaseForm" (ngSubmit)="editDatabase()" class="create-db-form">
+            <label class="section-title">Editar Base de Datos</label>
+            
+            <div class="form-group">
+              <input 
+                type="text" 
+                formControlName="name"
+                class="form-input"
+                placeholder="Nombre de la base de datos"
+                [class.is-invalid]="editDatabaseForm.get('name')?.invalid && editDatabaseForm.get('name')?.touched">
+              <div class="form-error" *ngIf="editDatabaseForm.get('name')?.invalid && editDatabaseForm.get('name')?.touched">
+                El nombre es requerido (mínimo 3 caracteres)
+              </div>
+            </div>
+
+            <div class="form-group">
+              <textarea 
+                formControlName="description"
+                class="form-input"
+                placeholder="Descripción de la base de datos"
+                rows="2"
+                [class.is-invalid]="editDatabaseForm.get('description')?.invalid && editDatabaseForm.get('description')?.touched"></textarea>
+              <div class="form-error" *ngIf="editDatabaseForm.get('description')?.invalid && editDatabaseForm.get('description')?.touched">
+                La descripción es requerida (mínimo 10 caracteres)
+              </div>
+            </div>
+
+            <div class="form-group">
+              <textarea 
+                formControlName="sqlSchema"
+                class="form-input"
+                placeholder="Esquema SQL"
+                rows="3"
+                [class.is-invalid]="editDatabaseForm.get('sqlSchema')?.invalid && editDatabaseForm.get('sqlSchema')?.touched"></textarea>
+              <div class="form-error" *ngIf="editDatabaseForm.get('sqlSchema')?.invalid && editDatabaseForm.get('sqlSchema')?.touched">
+                El esquema SQL es requerido (mínimo 20 caracteres)
+              </div>
+            </div>
+
+            <div class="button-group">
+              <button type="submit" class="btn-action" [disabled]="editDatabaseForm.invalid || isEditingDB">
+                {{ isEditingDB ? 'Guardando...' : 'Guardar Cambios' }}
+              </button>
+              <button type="button" class="btn-cancel" (click)="showEditDatabase = false">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Generator Form -->
+        <div class="section" *ngIf="selectedDatabaseId">
+          <label class="section-title">Describe tu consulta</label>
+          <form [formGroup]="queryForm" (ngSubmit)="generateQuery()">
+            <textarea 
+              formControlName="description"
+              class="prompt-textarea"
+              placeholder="Ejemplo: Dame todos los usuarios con más de 5 pedidos y muestra su email y número total de pedidos"
+              [class.is-invalid]="queryForm.get('description')?.invalid && queryForm.get('description')?.touched">
+            </textarea>
+            
+            <div class="form-hints" *ngIf="queryForm.get('description')?.invalid && queryForm.get('description')?.touched">
+              <div class="hint" *ngIf="queryForm.get('description')?.errors?.['required']">
+                La descripción es requerida
+              </div>
+              <div class="hint" *ngIf="queryForm.get('description')?.errors?.['minlength']">
+                Mínimo 10 caracteres
+              </div>
+              <div class="hint" *ngIf="queryForm.get('description')?.errors?.['maxlength']">
+                Máximo 1000 caracteres
+              </div>
+            </div>
+
+            <div class="button-group">
+              <button 
+                type="submit" 
+                class="btn-generate"
+                [disabled]="isGenerating || queryForm.invalid">
+                {{ isGenerating ? 'Generando...' : 'Generar Query' }}
+              </button>
+              <button 
+                type="button" 
+                class="btn-reset"
+                (click)="resetForm()">
+                Limpiar
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Generated Query Display -->
+        <div class="section" *ngIf="generatedQuery">
+          <label class="section-title">Query Generada</label>
+          <div class="query-display">
+            <pre class="sql-code">{{ generatedQuery }}</pre>
+          </div>
+          <div class="button-group">
+            <button class="btn-action" (click)="copyToClipboard()">
+              Copiar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel: History -->
+      <div class="history-panel">
+        <label class="section-title">Historial de Consultas</label>
+        
+        <div *ngIf="queries && queries.length === 0" class="empty-state">
+          <p>No hay consultas generadas aún</p>
+        </div>
+
+        <div *ngIf="queries && queries.length > 0" class="queries-list">
+          <div 
+            *ngFor="let query of queries | slice:0:10" 
+            class="query-item"
+            [class.selected]="generatedQuery === query.generatedSql"
+            (click)="selectQuery(query)">
+            
+            <div class="query-header">
+              <p class="query-prompt">{{ query.description | slice:0:50 }}...</p>
+              <span class="query-date">{{ query.createdAt | date:'dd/MM HH:mm' }}</span>
+            </div>
+
+            <div class="query-actions">
+              <button 
+                class="btn-delete"
+                (click)="deleteQuery(query.id); $event.stopPropagation()">
+                Eliminar
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="queries && queries.length > 10" class="query-count">
+            +{{ queries.length - 10 }} consultas más
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+

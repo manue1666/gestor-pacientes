@@ -236,5 +236,9 @@ export class PacientesComponent implements OnInit, OnDestroy {
         alert('❌ Error al cerrar sesión');
       });
   }
+
+  navigateToQueryBuilder(): void {
+    this.router.navigate(['/query-auth']);
+  }
 }
 

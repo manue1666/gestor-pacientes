@@ -1,0 +1,155 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <!-- Logo / Header -->
+    <div class="auth-header">
+      <h1>Query Builder</h1>
+      <p class="subtitle">Genera consultas SQL con IA</p>
+    </div>
+
+    <!-- Tabs para cambiar entre Login y Register -->
+    <div class="tabs-container">
+      <button 
+        class="tab-button" 
+        [class.active]="isLoginMode"
+        (click)="toggleMode()">
+        Iniciar Sesión
+      </button>
+      <button 
+        class="tab-button" 
+        [class.active]="!isLoginMode"
+        (click)="toggleMode()">
+        Registrarse
+      </button>
+    </div>
+
+    <!-- Mensajes de Error y Éxito -->
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="alert alert-success">
+      {{ successMessage }}
+    </div>
+
+    <!-- FORMULARIO DE LOGIN -->
+    <form *ngIf="isLoginMode" [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
+      <div class="form-group">
+        <label for="login-email">Correo Electrónico</label>
+        <input
+          type="email"
+          id="login-email"
+          class="form-control"
+          formControlName="email"
+          placeholder="tu@email.com"
+          [class.is-invalid]="loginEmail?.invalid && loginEmail?.touched">
+        <div class="invalid-feedback" *ngIf="loginEmail?.errors?.['required']">
+          El email es requerido
+        </div>
+        <div class="invalid-feedback" *ngIf="loginEmail?.errors?.['email']">
+          Ingresa un email válido
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="login-password">Contraseña</label>
+        <input
+          type="password"
+          id="login-password"
+          class="form-control"
+          formControlName="password"
+          placeholder="Ingresa tu contraseña"
+          [class.is-invalid]="loginPassword?.invalid && loginPassword?.touched">
+        <div class="invalid-feedback" *ngIf="loginPassword?.errors?.['required']">
+          La contraseña es requerida
+        </div>
+        <div class="invalid-feedback" *ngIf="loginPassword?.errors?.['minlength']">
+          La contraseña debe tener al menos 6 caracteres
+        </div>
+      </div>
+
+      <button 
+        type="submit" 
+        class="btn-submit"
+        [disabled]="isLoading">
+        {{ isLoading ? 'Cargando...' : 'Iniciar Sesión' }}
+      </button>
+    </form>
+
+    <!-- FORMULARIO DE REGISTRO -->
+    <form *ngIf="!isLoginMode" [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()">
+      <div class="form-group">
+        <label for="register-name">Nombre</label>
+        <input
+          type="text"
+          id="register-name"
+          class="form-control"
+          formControlName="name"
+          placeholder="Tu nombre"
+          [class.is-invalid]="registerName?.invalid && registerName?.touched">
+        <div class="invalid-feedback" *ngIf="registerName?.errors?.['required']">
+          El nombre es requerido
+        </div>
+        <div class="invalid-feedback" *ngIf="registerName?.errors?.['minlength']">
+          El nombre debe tener al menos 3 caracteres
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="register-email">Correo Electrónico</label>
+        <input
+          type="email"
+          id="register-email"
+          class="form-control"
+          formControlName="email"
+          placeholder="tu@email.com"
+          [class.is-invalid]="registerEmail?.invalid && registerEmail?.touched">
+        <div class="invalid-feedback" *ngIf="registerEmail?.errors?.['required']">
+          El email es requerido
+        </div>
+        <div class="invalid-feedback" *ngIf="registerEmail?.errors?.['email']">
+          Ingresa un email válido
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="register-password">Contraseña</label>
+        <input
+          type="password"
+          id="register-password"
+          class="form-control"
+          formControlName="password"
+          placeholder="Mínimo 6 caracteres"
+          [class.is-invalid]="registerPassword?.invalid && registerPassword?.touched">
+        <div class="invalid-feedback" *ngIf="registerPassword?.errors?.['required']">
+          La contraseña es requerida
+        </div>
+        <div class="invalid-feedback" *ngIf="registerPassword?.errors?.['minlength']">
+          La contraseña debe tener al menos 6 caracteres
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="register-confirm">Confirmar Contraseña</label>
+        <input
+          type="password"
+          id="register-confirm"
+          class="form-control"
+          formControlName="confirmPassword"
+          placeholder="Repite tu contraseña"
+          [class.is-invalid]="registerConfirmPassword?.invalid && registerConfirmPassword?.touched">
+        <div class="invalid-feedback" *ngIf="registerConfirmPassword?.errors?.['required']">
+          Debes confirmar la contraseña
+        </div>
+        <div class="invalid-feedback" *ngIf="registerConfirmPassword?.errors?.['passwordMismatch']">
+          Las contraseñas no coinciden
+        </div>
+      </div>
+
+      <button 
+        type="submit" 
+        class="btn-submit"
+        [disabled]="isLoading">
+        {{ isLoading ? 'Cargando...' : 'Registrarse' }}
+      </button>
+    </form>
+  </div>
+</div>

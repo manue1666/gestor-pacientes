@@ -2,7 +2,7 @@
   <!-- Header -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Gestión de Pacientes</h2>
-    <div *ngIf="user$ | async as user">
+    <div class="d-flex gap-2" *ngIf="user$ | async as user">
       <span class="me-3">Bienvenido, {{ user.displayName }}</span>
       <button class="btn btn-danger" (click)="logout()">
         Cerrar Sesión
@@ -128,6 +128,9 @@
           </tbody>
         </table>
       </div>
+      <button class="btn btn-info" (click)="navigateToQueryBuilder()">
+        Query Builder
+      </button>
     </div>
   </div>
 </div>
